@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "research-files": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${RESEARCH_DIR}"
+      ]
+    }
+  }
+}

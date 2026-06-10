@@ -1,0 +1,13 @@
+{
+  "name": "research-ppt-marketplace",
+  "owner": {
+    "name": "기술정보팀"
+  },
+  "plugins": [
+    {
+      "name": "research-ppt-plugin",
+      "source": ".",
+      "description": "자동 리서치(내부 자료 + 웹) 후 사내 PPT 템플릿으로 보고서 deck을 생성하는 멀티 에이전트 플러그인"
+    }
+  ]
+}

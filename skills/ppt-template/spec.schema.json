@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Research PPT deck spec",
+  "type": "object",
+  "required": ["title", "sections"],
+  "properties": {
+    "title": { "type": "string", "description": "표지 제목" },
+    "subtitle": { "type": "string", "description": "표지 부제 (선택)" },
+    "author": { "type": "string", "description": "작성자/팀명 (선택)" },
+    "date": { "type": "string", "description": "작성일 YYYY-MM-DD (선택)" },
+    "toc": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "목차 항목. 생략 시 sections의 divider/section_title에서 자동 추출"
+    },
+    "exec_summary": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 3,
+      "description": "핵심 결론 최대 3개 (배경 나열이 아니라 결론형 문장)"
+    },
+    "sections": {
+      "type": "array",
+      "description": "간지(divider) 객체와 내지(본문) 객체의 순서 있는 배열",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["divider"],
+            "properties": {
+              "divider": { "type": "string", "description": "장 구분(간지) 제목" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["head"],
+            "properties": {
+              "section_title": { "type": "string", "description": "좌상단 장 제목" },
+              "no": { "type": "string", "description": "번호 배지 (예: 01)" },
+              "tab": { "type": "string", "description": "소주제 탭 라벨" },
+              "breadcrumb": { "type": "string", "description": "우상단 경로 표시" },
+              "head": { "type": "string", "description": "핵심 한 줄 (결론형 문장, 필수)" },
+              "subtitle": { "type": "string", "description": "본문 위 소제목" },
+              "body": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "글머리표 본문 (2~5개 권장). table/image와 함께 쓰면 좌측 배치"
+              },
+              "table": {
+                "type": "object",
+                "description": "표. body와 함께면 우측, 단독이면 전체 폭",
+                "properties": {
+                  "headers": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "헤더 행(네이비 배경). 생략 가능"
+                  },
+                  "rows": {
+                    "type": "array",
+                    "items": { "type": "array", "items": { "type": "string" } },
+                    "description": "데이터 행들(각 행은 셀 문자열 배열)"
+                  }
+                },
+                "required": ["rows"]
+              },
+              "image": {
+                "type": "string",
+                "description": "이미지 파일 경로(절대 또는 spec 파일 기준 상대). body와 함께면 우측, 단독이면 전체 폭. 비율 유지."
+              },
+              "source": { "type": "string", "description": "출처" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
