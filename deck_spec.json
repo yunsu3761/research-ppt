@@ -1,102 +1,83 @@
 {
-  "title": "자율주행 다중센서·파운데이션 모델 기술 동향",
-  "subtitle": "내부 연구자료 + 최신 외부 동향 종합",
-  "author": "기술정보팀",
-  "date": "2026-06-10",
-  "exec_summary": [
-    "자율주행 인식은 단일 센서를 넘어 카메라·LiDAR·RADAR·이벤트 카메라를 결합한 다중센서 융합으로 이동하고 있으며, 4종 이상을 통합적으로 다루는 기업은 아직 드뭄",
-    "파운데이션 모델(VFM/MFM)이 학습되지 않은 돌발상황·새로운 환경 대응의 핵심 수단으로 부상하고 있음",
-    "악천후 구간에서는 LiDAR+4D RADAR 융합이 단일 센서의 오탐·미탐을 상호 보완하며 신뢰도를 끌어올림"
+  "title": "철강 산업 탈탄소화 동향 조사",
+  "report_type": "완료보고서",
+  "subtitle": "CCUS 및 그린스틸 전환 전략 분석",
+  "date": "2026. 6. 11",
+  "org": "POSCO IH",
+  "foreword": {
+    "recipient": "㈜포스코 생산기술전략실 귀중",
+    "title": "철강 산업 탈탄소화 동향 조사",
+    "body": "본 보고서는 포스코(이하 \"회사\")에서 발주한 \"철강 산업 탈탄소화 동향 조사\"에 대한 최종 용역 완료보고서입니다.\n전 세계 철강사들의 탄소중립 대응이 가속화됨에 따라, 주요 경쟁사의 CCUS·수소환원 전략과 시장 전망을 종합적으로 분석하였습니다.\n조사 결과가 회사의 탈탄소 전략 수립에 기여하기를 기대합니다.",
+    "source": "내부 검토"
+  },
+  "toc": [
+    "조사 개요 및 배경",
+    "주요 철강사 탈탄소 동향",
+    "CCUS 기술·비용 전망",
+    "종합 및 시사점"
   ],
   "sections": [
-    {"divider": "Ⅰ. 자율주행 센서 기술"},
-    {"section_title": "Ⅰ. 자율주행 센서 기술", "no": "01", "tab": "필수 센서",
-     "breadcrumb": "I. 센서 기술_ 1. 4대 필수 센서",
-     "head": "자율주행에는 장단점이 상호 보완되는 4종 센서(RADAR·LiDAR·이벤트 카메라·카메라)가 필수적임",
-     "subtitle": "자율주행 4대 필수 센서와 강점",
-     "body": [
-       "RADAR: 장거리 측정(Long-Range Resolution)",
-       "LiDAR: 정밀 3D 측정(Accurate 3D Sensing)",
-       "이벤트 카메라: 모션 블러 강건성(Robustness in Motion Blur)",
-       "카메라: 의미 이해(Semantic Understanding)"
-     ],
-     "table": {
-       "headers": ["센서", "핵심 강점", "대표 데이터셋"],
-       "rows": [
-         ["RADAR", "장거리", "K-RADAR"],
-         ["LiDAR", "정밀 3D", "KITTI"],
-         ["이벤트 카메라", "모션블러 강건", "DSEC"],
-         ["카메라", "의미 이해", "Cityscapes"]
-       ]
-     },
-     "source": "다중센서 기반 파운데이션 모델 연구 (KAIST 윤국진), p.7"},
-    {"section_title": "Ⅰ. 자율주행 센서 기술", "no": "02", "tab": "주행 작업",
-     "breadcrumb": "I. 센서 기술_ 2. 다중센서 작업",
-     "head": "다중센서를 활용하면 ACC·긴급제동·충돌회피 등 광범위한 자율주행 작업을 안정적으로 수행할 수 있음",
-     "subtitle": "다중센서 기반 주요 자율주행 작업",
-     "body": [
-       "Adaptive Cruise Control(ACC), Emergency Brake Assist(EBA)",
-       "Collision Avoidance, Lane Departure Warning(LDW)",
-       "Traffic-Sign Recognition, Blind Spot Monitor",
-       "Pedestrian Detection, Intelligent Parking Assist"
-     ],
-     "source": "다중센서 기반 파운데이션 모델 연구 (KAIST 윤국진), p.9"},
-    {"divider": "Ⅱ. 파운데이션 모델 동향"},
-    {"section_title": "Ⅱ. 파운데이션 모델 동향", "no": "01", "tab": "필요성",
-     "breadcrumb": "II. 파운데이션 모델_ 1. 필요성",
-     "head": "기존 자율주행 AI는 학습되지 않은 돌발상황에서 인식 오류가 발생하며, 이를 파운데이션 모델로 보완하려는 흐름이 강함",
-     "subtitle": "현행 기술의 한계와 파운데이션 모델의 역할",
-     "body": [
-       "데이터셋마다 센서 구성이 달라 대규모 다중센서 데이터 확보가 어려움",
-       "개별 센서 독립 연구로 연산비용 증가, AI 신뢰성 평가 기술 미흡",
-       "광범위한 보편 지식 기반의 파운데이션 모델로 새로운 환경 대응 시도"
-     ],
-     "source": "다중센서 기반 파운데이션 모델 연구 (KAIST 윤국진), p.11~12"},
-    {"section_title": "Ⅱ. 파운데이션 모델 동향", "no": "02", "tab": "적용사례",
-     "breadcrumb": "II. 파운데이션 모델_ 2. VFM 적용사례",
-     "head": "SAM 기반 비전 파운데이션 모델(VFM)이 분할·깊이추정·점유예측 등 다양한 인식 작업에 적용되고 있음",
-     "subtitle": "자율주행 VFM 적용사례 (SAM 기반)",
-     "table": {
-       "headers": ["모델", "활용 센서", "수행 작업"],
-       "rows": [
-         ["Calib-Anything", "Camera, LiDAR", "2D Segmentation"],
-         ["RobustSAM", "Camera", "2D Segmentation"],
-         ["SEAL", "Camera, LiDAR", "3D Segmentation"],
-         ["RadOcc", "Camera, LiDAR", "Depth·Occupancy 예측"],
-         ["GPT-Driver", "LiDAR, Text", "경로계획"]
-       ]
-     },
-     "source": "다중센서 기반 파운데이션 모델 연구 (KAIST 윤국진), p.27"},
-    {"section_title": "Ⅱ. 파운데이션 모델 동향", "no": "03", "tab": "악천후",
-     "breadcrumb": "II. 파운데이션 모델_ 3. 악천후 융합",
-     "head": "안개 등 악천후에서 RADAR 단독은 오탐, LiDAR 단독은 미탐이 발생하며 LiDAR+4D RADAR 융합이 이를 보완함",
-     "subtitle": "악천후 3D 객체검출: LiDAR + 4D RADAR 융합",
-     "body": [
-       "Fog 환경에서 RADAR only → False positives 발생",
-       "LiDAR only → Missing detections 발생",
-       "융합 모델이 양 센서 강점을 결합해 강건성 확보 (CVPR/ECCV 2024)"
-     ],
-     "source": "다중센서 기반 파운데이션 모델 연구 (KAIST 윤국진), p.35~36"},
-    {"divider": "Ⅲ. 외부 동향 및 시사점"},
-    {"section_title": "Ⅲ. 외부 동향 및 시사점", "no": "01", "tab": "외부 동향",
-     "breadcrumb": "III. 시사점_ 1. 최신 외부 동향",
-     "head": "최신 연구는 통합 BEV 표현과 토큰 단위 교차모달 정렬 두 축으로 다중센서 융합 아키텍처가 수렴하고 있음을 보여줌",
-     "subtitle": "2026년 다중센서 융합 연구 동향 (외부)",
-     "body": [
-       "4D RADAR가 거리·방위·고도·도플러를 측정해 LiDAR에 근접한 밀집 3D 포인트 제공",
-       "지배적 아키텍처 2종: 통합 BEV 표현 / 토큰 단위 교차모달 정렬",
-       "데이터셋별 독립 학습 후 결합하는 모듈형 late-fusion 프레임워크 부상"
-     ],
-     "source": "Multimodal Sensor Fusion in Autonomous Vehicles (MDPI Sensors, 2026); A Review of Multi-Sensor Fusion (MDPI, 2025)"},
-    {"section_title": "Ⅲ. 외부 동향 및 시사점", "no": "02", "tab": "시사점",
-     "breadcrumb": "III. 시사점_ 2. 종합 제언",
-     "head": "국내 OEM은 다중센서 데이터 파이프라인 내재화와 파운데이션 모델 경량화에 우선 투자할 필요가 있음",
-     "subtitle": "종합 시사점",
-     "body": [
-       "4종 이상 다중센서를 통합 처리하는 역량이 차별화 포인트(현재 기업 부재)",
-       "VFM/MFM 기반 인식으로 돌발상황·신규환경 대응력 확보",
-       "악천후 신뢰성은 LiDAR+4D RADAR 융합으로 우선 보강"
-     ],
-     "source": "내부 종합 (KAIST 연구자료 + 외부 동향, 2026)"}
+    { "divider": "Ⅰ. 조사 개요 및 배경" },
+    {
+      "section_title": "Ⅰ. 조사 개요 및 배경",
+      "head": "철강 탈탄소는 규제·시장 압력으로 선택이 아닌 필수가 되었음",
+      "subtitle": "조사 배경",
+      "body": [
+        "EU CBAM 본격 시행으로 탄소비용이 수출 경쟁력에 직접 영향",
+        "글로벌 그린스틸 수요가 2030년까지 연 20% 이상 성장 전망",
+        "주요 경쟁사들이 수소환원·CCUS 투자를 빠르게 확대 중"
+      ],
+      "source": "BNEF (2026), Wood Mackenzie (2026)"
+    },
+    { "divider": "Ⅱ. 주요 철강사 탈탄소 동향" },
+    {
+      "section_title": "Ⅱ. 주요 철강사 탈탄소 동향",
+      "head": "선도 철강사는 수소환원 중심, 후발사는 CCUS 병행 전략을 취함",
+      "subtitle": "경로별 비교",
+      "columns": [
+        [
+          "수소환원제철(H2-DRI) 중심 전환",
+          "재생에너지 기반 그린수소 확보가 관건",
+          "대규모 설비 투자·장기 리드타임 필요"
+        ],
+        [
+          "기존 고로 + CCUS 병행으로 단계적 감축",
+          "포집 비용·저장 인프라가 경제성 좌우",
+          "상대적으로 빠른 적용 가능"
+        ]
+      ],
+      "col_titles": ["수소환원 경로", "CCUS 경로"],
+      "source": "ArcelorMittal, BNEF Steel CCUS update (2024)"
+    },
+    {
+      "section_title": "Ⅲ. CCUS 기술·비용 전망",
+      "head": "CCUS 포집비용은 2030년까지 30% 이상 하락이 전망됨",
+      "subtitle": "비용 전망",
+      "body": [
+        "현재 톤당 포집비용은 기술별로 큰 편차 존재",
+        "규모 확대와 학습효과로 단가 지속 하락 예상",
+        "탄소가격 상승과 맞물려 경제성 분기점 도달"
+      ],
+      "table": {
+        "headers": ["구분", "2026", "2030(E)"],
+        "rows": [
+          ["포집비용($/t)", "85", "58"],
+          ["탄소가격($/t)", "70", "110"],
+          ["경제성", "미달", "확보"]
+        ]
+      },
+      "source": "Wood Mackenzie CCUS SPO (2026)"
+    },
+    { "divider": "Ⅳ. 종합 및 시사점" },
+    {
+      "section_title": "Ⅳ. 종합 및 시사점",
+      "head": "단기 CCUS·중장기 수소환원의 투트랙 전략이 합리적임",
+      "body": [
+        "단기: 기존 설비에 CCUS를 적용해 규제 리스크 우선 완화",
+        "중장기: 그린수소 확보와 연계한 수소환원 전환 추진",
+        "정책·탄소가격 변화를 지속 모니터링하며 투자 시점 조정"
+      ],
+      "source": "종합 분석"
+    }
   ]
 }

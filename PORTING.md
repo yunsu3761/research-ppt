@@ -80,15 +80,16 @@ python3 skills/ppt-template/inspect_template.py skills/ppt-template/template.ppt
 - **(1) LAYOUTS** — 새 템플릿의 레이아웃 이름으로 매핑
   ```python
   LAYOUTS = {
-      "cover":   "Title",        # 새 표지 레이아웃 이름
-      "toc":     "Contents",
-      "exec":    "Summary",
-      "divider": "Section",
-      "body":    "Body",
-      "ending":  "Closing",
+      "cover":    "표지",
+      "foreword": "들어가며",
+      "toc":      "간지",     # 이 양식은 목차/간지/엔딩이 같은 '간지' 레이아웃을 재사용
+      "divider":  "간지",
+      "body":     "본문1",    # 빈(깨끗한) 본문 레이아웃. 본문2/3/4는 빨간 가이드박스가 박혀 있어 사용 X
+      "ending":   "간지",
   }
   ```
-  (해당 역할의 레이아웃이 없으면, 가장 가까운 레이아웃 이름을 넣는다.)
+  (해당 역할의 레이아웃이 없으면, 가장 가까운 레이아웃 이름을 넣는다. 한 레이아웃을
+  여러 역할에 재사용해도 된다.)
 
 - **(2) 폰트** `F_TITLE/F_HEAD/F_BODY/F_SRC/F_DIV` — 새 사내 폰트 이름으로
 - **(3) 색상** `NAVY/DARK/...` — 새 브랜드 컬러로

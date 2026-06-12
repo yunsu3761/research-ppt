@@ -23,7 +23,7 @@ argument-hint: [보고서 주제]
 각 에이전트에는 담당 하위 질문을 명확히 전달한다.
 
 ## 3단계 — 종합
-모든 조사 결과를 모아 `synthesizer` 에게 넘겨 보고서 구조(Executive Summary +
+모든 조사 결과를 모아 `synthesizer` 에게 넘겨 보고서 구조(들어가며(서문) +
 목차 + 섹션별 head/본문/출처)로 통합한다.
 
 ## 4단계 — deck 생성

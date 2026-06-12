@@ -1,23 +1,34 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Research PPT deck spec",
+  "title": "Research PPT deck spec (보고서양식 / POSCO IH)",
   "type": "object",
   "required": ["title", "sections"],
   "properties": {
     "title": { "type": "string", "description": "표지 제목" },
+    "report_type": { "type": "string", "description": "표지 상단 배지(예: 완료보고서). 기본 '완료보고서'" },
     "subtitle": { "type": "string", "description": "표지 부제 (선택)" },
-    "author": { "type": "string", "description": "작성자/팀명 (선택)" },
-    "date": { "type": "string", "description": "작성일 YYYY-MM-DD (선택)" },
+    "date": { "type": "string", "description": "표지 하단 작성일 (예: 2026. 6. 11)" },
+    "org": { "type": "string", "description": "표지 하단 기관명. 기본 'POSCO IH'" },
+    "closing": { "type": "string", "description": "엔딩(간지) 문구. 기본 '감사합니다.'" },
+    "foreword": {
+      "type": "object",
+      "description": "들어가며(서문) 슬라이드. 발주처 수신·제목 + 서문 본문. (이전 버전의 exec_summary 대체)",
+      "properties": {
+        "recipient": { "type": "string", "description": "수신처 (예: ㈜포스코 생산기술전략실 귀중)" },
+        "title": { "type": "string", "description": "제목(보고 주제)" },
+        "body": {
+          "description": "서문 본문. 문자열(줄바꿈 \\n 으로 단락 분리) 또는 단락 문자열 배열",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        }
+      }
+    },
     "toc": {
       "type": "array",
       "items": { "type": "string" },
       "description": "목차 항목. 생략 시 sections의 divider/section_title에서 자동 추출"
-    },
-    "exec_summary": {
-      "type": "array",
-      "items": { "type": "string" },
-      "maxItems": 3,
-      "description": "핵심 결론 최대 3개 (배경 나열이 아니라 결론형 문장)"
     },
     "sections": {
       "type": "array",
@@ -28,7 +39,7 @@
             "type": "object",
             "required": ["divider"],
             "properties": {
-              "divider": { "type": "string", "description": "장 구분(간지) 제목" }
+              "divider": { "type": "string", "description": "장 구분(간지) 제목 (예: Ⅱ. 주요 동향)" }
             },
             "additionalProperties": false
           },
@@ -36,16 +47,25 @@
             "type": "object",
             "required": ["head"],
             "properties": {
-              "section_title": { "type": "string", "description": "좌상단 장 제목" },
-              "no": { "type": "string", "description": "번호 배지 (예: 01)" },
-              "tab": { "type": "string", "description": "소주제 탭 라벨" },
-              "breadcrumb": { "type": "string", "description": "우상단 경로 표시" },
-              "head": { "type": "string", "description": "핵심 한 줄 (결론형 문장, 필수)" },
-              "subtitle": { "type": "string", "description": "본문 위 소제목" },
+              "section_title": { "type": "string", "description": "상단 장 라벨 (예: Ⅱ. 주요 동향)" },
+              "head": { "type": "string", "description": "대제목 = 핵심 한 줄(결론형 문장, 가운데 정렬, 필수)" },
+              "subtitle": { "type": "string", "description": "■ 소제목 (본문 위)" },
               "body": {
                 "type": "array",
                 "items": { "type": "string" },
                 "description": "글머리표 본문 (2~5개 권장). table/image와 함께 쓰면 좌측 배치"
+              },
+              "columns": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": { "type": "array", "items": { "type": "string" } },
+                "description": "2단 비교 레이아웃. [좌측 글머리표[], 우측 글머리표[]]. 가운데 구분선 자동"
+              },
+              "col_titles": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "2단(columns 또는 body+table/image)일 때 좌/우 컬럼 소제목 (선택)"
               },
               "table": {
                 "type": "object",
