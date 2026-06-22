@@ -1,6 +1,6 @@
 {
   "name": "research-ppt-plugin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "내부 자료 폴더와 웹 검색으로 자동 리서치한 뒤 사내 PPT 템플릿에 맞춰 보고서(PPTX)를 생성하는 멀티 에이전트 플러그인",
   "author": {
     "name": "기술정보팀"

@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Research PPT deck spec (보고서양식 / POSCO IH)",
+  "description": "강조 마크업: 텍스트(head·body·columns·table.rows 셀)에 **키워드** → 네이비 볼드, ==수치== → 레드 볼드+노란 형광. 비교 데이터는 table, 원문 그림은 image 로.",
   "type": "object",
   "required": ["title", "sections"],
   "properties": {
@@ -48,7 +49,7 @@
             "required": ["head"],
             "properties": {
               "section_title": { "type": "string", "description": "상단 장 라벨 (예: Ⅱ. 주요 동향)" },
-              "head": { "type": "string", "description": "대제목 = 핵심 한 줄(결론형 문장, 가운데 정렬, 필수)" },
+              "head": { "type": "string", "description": "대제목 = 핵심 한 줄(결론형 문장, 가운데 정렬, 필수). 핵심은 **키워드**/==수치== 마크업으로 강조" },
               "subtitle": { "type": "string", "description": "■ 소제목 (본문 위)" },
               "body": {
                 "type": "array",

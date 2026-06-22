@@ -20,12 +20,14 @@ spec.json 스키마는 같은 폴더의 SKILL.md 와 spec.schema.json 을 참조
 import argparse
 import json
 import os
+import re
 import sys
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.oxml.ns import qn
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE = os.path.join(HERE, "template.pptx")
@@ -81,6 +83,58 @@ WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 #     좌표가 어긋나면 render_preview.sh 로 렌더해 눈으로 보며 조정한다.
 # ====================================================================
 
+# ---------------------------------------------------------------- 강조(하이라이트) 마크업
+# 본문/표/head 텍스트에 인라인 마크업으로 핵심을 강조한다.
+#   **키워드**  -> 네이비 볼드 (핵심 용어 강조)
+#   ==수치==    -> 레드 볼드 + 노란 형광 (핵심 수치/지표 하이라이트)
+# 마크업이 없으면 단일 run과 동일하게 동작(기존 spec 호환).
+HL_TERM = BLUE                       # 키워드 강조색(네이비)
+HL_NUM = RGBColor(0xC0, 0x39, 0x2B)  # 수치 강조색(레드)
+HL_BG = "FFF29A"                     # 수치 형광(노랑)
+_MARK_RE = re.compile(r"(\*\*.+?\*\*|==.+?==)")
+
+
+def _set_run_highlight(run, hexstr):
+    """run 에 PowerPoint 텍스트 형광(a:highlight)을 입힌다(지원 환경에서 표시)."""
+    rPr = run._r.get_or_add_rPr()
+    for old in rPr.findall(qn("a:highlight")):
+        rPr.remove(old)
+    hl = rPr.makeelement(qn("a:highlight"), {})
+    hl.append(rPr.makeelement(qn("a:srgbClr"), {"val": hexstr}))
+    ref = rPr.find(qn("a:solidFill"))
+    if ref is not None:
+        ref.addnext(hl)
+    else:
+        rPr.insert(0, hl)
+
+
+def _emit_runs(p, text, font, size, color, bold):
+    """text 를 **키워드** / ==수치== 마크업 단위로 분해해 paragraph에 run으로 추가."""
+    for tok in _MARK_RE.split(text):
+        if tok == "":
+            continue
+        kind = None
+        if len(tok) >= 4 and tok.startswith("**") and tok.endswith("**"):
+            tok, kind = tok[2:-2], "term"
+        elif len(tok) >= 4 and tok.startswith("==") and tok.endswith("=="):
+            tok, kind = tok[2:-2], "num"
+        run = p.add_run()
+        run.text = tok
+        f = run.font
+        f.name = font
+        f.size = Pt(size)
+        if kind == "term":
+            f.bold = True
+            f.color.rgb = HL_TERM
+        elif kind == "num":
+            f.bold = True
+            f.color.rgb = HL_NUM
+            _set_run_highlight(run, HL_BG)
+        else:
+            f.bold = bold
+            f.color.rgb = color
+    return p
+
 
 # ---------------------------------------------------------------- helpers
 def layout_by_name(prs, name):
@@ -110,8 +164,9 @@ def add_slide(prs, layout_name):
 def textbox(slide, left, top, width, height, text,
             font=F_BODY, size=11, bold=False, color=GRAY,
             align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP, line_spacing=1.0,
-            wrap=True):
-    """단일 문자열 텍스트박스. wrap=False면 짧은 라벨이 줄바꿈되지 않음."""
+            wrap=True, rich=False):
+    """단일 문자열 텍스트박스. wrap=False면 짧은 라벨이 줄바꿈되지 않음.
+    rich=True면 **키워드**/==수치== 마크업을 파싱해 강조 run을 만든다."""
     tb = slide.shapes.add_textbox(Inches(left), Inches(top),
                                   Inches(width), Inches(height))
     tf = tb.text_frame
@@ -121,13 +176,16 @@ def textbox(slide, left, top, width, height, text,
     p.alignment = align
     if line_spacing:
         p.line_spacing = line_spacing
-    run = p.add_run()
-    run.text = text
-    f = run.font
-    f.name = font
-    f.size = Pt(size)
-    f.bold = bold
-    f.color.rgb = color
+    if rich:
+        _emit_runs(p, text, font, size, color, bold)
+    else:
+        run = p.add_run()
+        run.text = text
+        f = run.font
+        f.name = font
+        f.size = Pt(size)
+        f.bold = bold
+        f.color.rgb = color
     return tb
 
 
@@ -144,13 +202,7 @@ def paragraphs(slide, left, top, width, height, lines,
         p.alignment = align
         p.line_spacing = line_spacing
         p.space_after = Pt(space_after)
-        run = p.add_run()
-        run.text = line
-        f = run.font
-        f.name = font
-        f.size = Pt(size)
-        f.bold = bold
-        f.color.rgb = color
+        _emit_runs(p, line, font, size, color, bold)
     return tb
 
 
@@ -166,13 +218,15 @@ def bullets(slide, left, top, width, height, items,
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.line_spacing = line_spacing
         p.space_after = Pt(space_after)
-        run = p.add_run()
-        run.text = f"{bullet_char}{item}"
-        f = run.font
-        f.name = font
-        f.size = Pt(size)
-        f.bold = bold
-        f.color.rgb = color
+        # 글머리표 기호(강조 없음) + 본문(마크업 파싱)
+        r0 = p.add_run()
+        r0.text = bullet_char
+        f0 = r0.font
+        f0.name = font
+        f0.size = Pt(size)
+        f0.bold = bold
+        f0.color.rgb = color
+        _emit_runs(p, item, font, size, color, bold)
     return tb
 
 
@@ -197,7 +251,7 @@ def vline(slide, left, top, height, color=HEADER, weight=1.0):
 
 
 def _set_cell(cell, text, size=10, bold=False, color=GRAY,
-              fill=None, align=PP_ALIGN.LEFT):
+              fill=None, align=PP_ALIGN.LEFT, rich=False):
     cell.vertical_anchor = MSO_ANCHOR.MIDDLE
     cell.margin_left = Inches(0.06)
     cell.margin_right = Inches(0.06)
@@ -212,13 +266,16 @@ def _set_cell(cell, text, size=10, bold=False, color=GRAY,
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.alignment = align
-    run = p.add_run()
-    run.text = str(text)
-    f = run.font
-    f.name = F_BODY
-    f.size = Pt(size)
-    f.bold = bold
-    f.color.rgb = color
+    if rich:
+        _emit_runs(p, str(text), F_BODY, size, color, bold)
+    else:
+        run = p.add_run()
+        run.text = str(text)
+        f = run.font
+        f.name = F_BODY
+        f.size = Pt(size)
+        f.bold = bold
+        f.color.rgb = color
 
 
 def add_table(slide, left, top, width, height, headers, rows,
@@ -244,7 +301,7 @@ def add_table(slide, left, top, width, height, headers, rows,
         for c in range(ncols):
             val = row[c] if c < len(row) else ""
             _set_cell(tbl.cell(r0 + ri, c), val, size=size, color=GRAY,
-                      fill=WHITE)
+                      fill=WHITE, rich=True)
     return gframe
 
 
@@ -358,7 +415,7 @@ def _body_header(s, sec):
     if head:
         textbox(s, 0.3, 0.82, 10.2, 0.55, head,
                 font=F_HEAD, size=22, bold=True, color=BLUE,
-                align=PP_ALIGN.CENTER, line_spacing=1.0)
+                align=PP_ALIGN.CENTER, line_spacing=1.0, rich=True)
         hline(s, 0.67, 1.42, 9.57, color=NAVY, weight=1.25)
     # ■ 소제목
     content_top = 1.7
